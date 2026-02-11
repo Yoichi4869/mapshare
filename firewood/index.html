@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="薪の販売場所を地図上で共有できるアプリケーション">
+    <meta name="theme-color" content="#8B4513">
+    <title>薪マップ - 薪の販売場所共有アプリ</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🪵%3C/text%3E%3C/svg%3E">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/src/firewood/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <a href="/" class="back-to-home" title="トップへ戻る">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1><i class="fas fa-fire"></i> 薪マップ</h1>
+            <div class="header-actions">
+              <button id="refreshBtn" title="最新の情報に更新">
+                  <i class="fas fa-sync-alt"></i>
+              </button>
+              <button id="addLocationBtn" class="btn btn-primary">
+                  <i class="fas fa-plus"></i> 新規登録
+              </button>
+              <button id="helpBtn" class="btn btn-help" title="使い方の説明">
+                  <i class="fas fa-question-circle"></i>
+              </button>
+           </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="map"></div>
+
+        <!-- フィルターパネル -->
+        <div id="filterPanel" class="filter-panel">
+            <button id="filterToggle" class="filter-toggle">
+                <i class="fas fa-filter"></i> フィルター
+            </button>
+            
+            <button id="locateBtn" class="locate-btn" title="現在地を表示">
+                <i class="fas fa-location-arrow"></i>
+            </button>
+            
+            <div id="filterContent" class="filter-content">
+                <div class="filter-group">
+                    <label for="woodTypeFilter">薪の種類</label>
+                    <select id="woodTypeFilter">
+                        <option value="">すべての種類</option>
+                         <option value="針葉樹">針葉樹</option>
+                         <option value="マツ">マツ</option>
+                         <option value="スギ">スギ</option>
+                         <option value="ヒノキ">ヒノキ</option>
+                         <option value="サクラ">サクラ</option>
+                         <option value="広葉樹">広葉樹</option>
+                         <option value="クヌギ">クヌギ</option>
+                         <option value="ナラ">ナラ</option>
+                         <option value="カシ">カシ</option>
+                         <option value="その他">その他</option>
+                        </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchQuery">キーワード検索</label>
+                    <input type="text" id="searchQuery" placeholder="場所名、備考で検索">
+                </div>
+                <button id="applyFilter" class="btn btn-secondary">
+                    <i class="fas fa-search"></i> 検索
+                </button>
+                <button id="clearFilter" class="btn btn-outline">
+                    <i class="fas fa-times"></i> クリア
+                </button>
+            </div>
+        </div>
+
+        <!-- 登録リスト -->
+        <div id="listPanel" class="list-panel collapsed">
+            <div class="list-header">
+                <h2><i class="fas fa-list"></i> 登録一覧</h2>
+                <button id="listToggle" class="list-toggle">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+            </div>
+            <div id="listContent" class="list-content">
+                <div id="locationList"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 登録モーダル -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> 薪販売場所の登録</h2>
+                <button class="close-btn" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addLocationForm" novalidate>
+               <input type="hidden" id="editId">
+               <input type="hidden" id="salesPeriod">
+                <input type="hidden" id="contactInfo">
+                <input type="hidden" id="description">
+                <!--<div class="search-outer-container">
+                   <label class="form-label">場所を検索 (住所や施設名)</label>
+                   <div class="search-flex-box">
+                       <input type="text" id="placeSearch" class="form-control" placeholder="例: 東京都千代田区">
+                       <button type="button" id="execSearchBtn" class="btn-secondary">
+                           <i class="fas fa-search"></i>
+                       </button>
+                   </div>
+                   <div id="searchResults" class="search-results-list"></div>
+                   <small class="help-text">
+                       <i class="fas fa-info-circle"></i>うまく検索できない場合は地図から探してね
+                   </small>
+               </div>
+
+                <hr class="form-divider">-->
+
+                <div class="form-group">
+                    <label for="locationName">場所名 <span class="required">*</span></label>
+                    <input type="text" id="locationName" class="form-control" maxlength="40" required placeholder="例：〇〇薪販売所 （40文字まで）">
+                </div>
+
+                <div class="form-group">
+                    <label for="woodType">薪の種類 <span class="required">*</span></label>
+                    <select id="woodType" class="form-control">
+                         <option value="">選択してください</option>
+                         <option value="針葉樹">針葉樹</option>
+                         <option value="マツ">マツ</option>
+                         <option value="スギ">スギ</option>
+                         <option value="ヒノキ">ヒノキ</option>
+                         <option value="サクラ">サクラ</option>
+                         <option value="広葉樹">広葉樹</option>
+                         <option value="クヌギ">クヌギ</option>
+                         <option value="ナラ">ナラ</option>
+                         <option value="カシ">カシ</option>
+                         <option value="その他">その他</option>
+                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">数量・単位</label>
+                    <input type="text" id="amount" class="form-control" maxlength="10" placeholder="例: 1束 / 15kg など">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">価格 <span class="required">*</span></label>
+                    <input type="number" id="price" class="form-control" placeholder="例: 700" min="0" step="1" pattern="\d*" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="latitude">緯度 <span class="required">*</span></label>
+                        <input type="text" id="latitude" step="0.000001" required placeholder="例：35.681236">
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">経度 <span class="required">*</span></label>
+                        <input type="text" id="longitude" step="0.000001" required placeholder="例：139.767125">
+                    </div>
+                </div>
+                <div class="form-group form-actions-coordinate">
+                    <button type="button" class="btn btn-outline-secondary" id="selectFromMapBtn">
+                        <i class="fas fa-map-marker-alt"></i> 地図から選択
+                    </button>
+                    <button type="button" id="getCurrentLocation" class="btn btn-outline-secondary">
+                        <i class="fas fa-location-arrow"></i> 現在地を取得
+                    </button>
+                </div><input type="hidden" id="salesPeriod">
+                    <input type="hidden" id="contactInfo">
+                    <input type="hidden" id="description">
+               
+                <div class="form-group">
+                    <label for="notes">備考</label>
+                    <textarea id="notes" rows="4" class="form-control" maxlength="100" placeholder="営業時間、その他の情報など  （100文字まで）"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelBtn">キャンセル</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 登録
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 詳細モーダル -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> 詳細情報</h2>
+                <button class="close-btn" id="closeDetailBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div> 
+
+     <!-- ヘルプモーダル -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content help-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> 使い方マニュアル</h2>
+                <button class="close-btn" onclick="window.closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body help-body">
+                <div class="manual-container">
+                    <div class="manual-item">
+                        <h4>1. 地図から薪を探す</h4>
+                        <img src="/img/manual1.png" alt="使い方1" class="manual-img">
+                        <p>ピンをタップすると、その場所の薪情報や詳細を確認できます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>2. 詳細画面を開く</h4>
+                        <img src="/img/manual2.png" alt="使い方2" class="manual-img">
+                        <p>「詳細を見る」を押すと詳細画面が開きます。「追加登録」を押すと同じ場所で情報を追加することができます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>3. 詳細画面について</h4>
+                        <img src="/img/manual3.png" alt="使い方3" class="manual-img">
+                        <p>詳細画面では価格や薪の種類、最終更新日などを確認できます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>4. 情報を編集・修正</h4>
+                        <img src="/img/manual4.png" alt="使い方4" class="manual-img">
+                        <p>「編集」ボタンから、古くなった情報や間違った情報を最新に書き換えられます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>5. 新規で登録</h4>
+                        <img src="/img/manual5.png" alt="使い方5" class="manual-img">
+                        <p>新規登録や登録してある一覧を参照することができます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>6. 新規登録画面について</h4>
+                        <img src="/img/manual6.png" alt="使い方6" class="manual-img">
+                        <p>必要な情報を入力して、登録ボタンを押すとマップに登録されます。</p>
+                    </div>
+                    <div class="manual-item">
+                        <h4>薪マップについて</h4>
+                        <p>当アプリは、キャンプユーザー同士で薪の販売情報を共有するために開始した個人開発プロジェクトです</p>
+                        <p style="font-size: 0.9rem; color: #666;">
+                            © 2026 薪マップ Project 
+                            Developed by ゆきぬ<br>
+                            お問い合わせ：X(Twitter) @lowgeh
+                        </p>
+                        <button id="openContactBtn" class="btn btn-outline" style="width: 100%;">
+                            <i class="fas fa-envelope"></i> 開発者へ要望・報告を送る
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="window.closeHelpModal()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 8px;">閉じる</button>
+            </div>
+        </div>
+    </div>
+     <!-- 問い合わせモーダル -->
+    <div id="contactModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-envelope"></i> お問い合わせ</h2>
+            <button class="close-btn" id="closeContactModalBtn">&times;</button>
+        </div>
+        <form id="contactForm">
+            <div class="form-group">
+                <label>お名前（ニックネーム可）</label>
+                <input type="text" id="contactName" class="form-control" maxlength="20" required placeholder="焚き火 太郎">
+            </div>
+            <div class="form-group">
+                <label>メールアドレス（返信が必要な場合）</label>
+                <input type="email" id="contactEmail" class="form-control" maxlength="100" placeholder="example@mail.com">
+            </div>
+            <div class="form-group">
+                <label>お問い合わせ項目</label>
+                <select id="contactCategory">
+                    <option value="要望">新機能・改善のご要望</option>
+                    <option value="不具合">不具合の報告</option>
+                    <option value="削除依頼">情報の削除依頼</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea id="contactMessage" class="form-control" maxlength="400" required placeholder="お問い合わせ内容をご記入ください" style="height: 120px;"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="cancelContactBtn">キャンセル</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> 送信する
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script type="module" src="/src/firewood/main.js"></script>
+</body>
+</html>

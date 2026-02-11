@@ -1,0 +1,82 @@
+const CACHE_NAME = 'mapshare-v2';
+const urlsToCache = [
+  '/',
+  '/firewood/',
+  '/sake/',
+  '/beer/',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css'
+];
+
+// インストール時にキャッシュを作成
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache.map(url => new Request(url, { cache: 'reload' })));
+      })
+      .catch(err => {
+        console.log('Cache install error:', err);
+      })
+  );
+  self.skipWaiting();
+});
+
+// アクティベート時に古いキャッシュを削除
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// フェッチ時にキャッシュを使用（Network First戦略）
+self.addEventListener('fetch', event => {
+  // APIリクエストはキャッシュしない
+  if (event.request.url.includes('/tables/') || event.request.url.includes('/rest/v1/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // レスポンスが有効な場合のみキャッシュ
+        if (!response || response.status !== 200 || response.type === 'error') {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME)
+          .then(cache => {
+            if (event.request.url.startsWith('http')) {
+                cache.put(event.request, responseToCache);
+            }
+          });
+
+        return response;
+      })
+      .catch(() => {
+        // ネットワークエラー時にキャッシュから取得
+        return caches.match(event.request)
+          .then(response => {
+            if (response) {
+              return response;
+            }
+            // キャッシュにもない場合はトップページを表示
+            return caches.match('/');
+          });
+      })
+  );
+});
