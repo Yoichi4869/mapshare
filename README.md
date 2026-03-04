@@ -166,6 +166,37 @@ MapShareのトップページ。各マップへのナビゲーションと、お
 
 ---
 
+## 酒マップ（sake）
+
+日本酒好き同士で日本酒の酒蔵を共有するWebアプリケーションです。
+
+### 主な機能
+
+- 酒蔵のマップ表示(ピン表示・クラスタリング)
+- 新規登録 / 編集 /削除
+- 日本酒の種類・キーワードによるフィルター検索
+- 現在地取得・地図からの座標選択
+- 不適切な情報の通報機能
+- お問い合わせフォーム
+- ヘルプ表示機能（操作マニュアル）
+- PWA対応（Service Worker）
+
+### データモデル（sake_locations テーブル）
+
+| フィールド名 | 型 | 説明 |
+|------------|-----|------|
+| id | text | レコードID（自動生成） |
+| location_name | text | 場所名 |
+| sake_type | text | 酒の種類（） |
+| price | number | 価格 |
+| latitude | number | 緯度 |
+| longitude | number | 経度 |
+| notes | text | 備考 |
+| updated_at | timestamp | 最終更新日 |
+| report_count | number | 通報回数 |
+
+---
+
 ## 今後の展開予定
 
 ### 酒マップ（sake）/ ビールマップ（beer）
