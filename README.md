@@ -188,15 +188,16 @@ MapShareのトップページ。各マップへのナビゲーションと、お
 
 | フィールド名 | 型 | 説明 |　意図　|
 |------------|-----|------|
-| id | text | レコードID（自動生成） |  一意にするため　|
+| id | int8 | レコードID（自動生成） |  一意にするため　|
 | location_name | text | 場所名 |　マップの位置を知るため　|
 | wood_type | text | 薪の種類（針葉樹、広葉樹、ナラ、クヌギ、杉、松、ヒノキ、桜、カシ、その他） |　どんな種類があるのかを知るため　|
-| price | number | 価格 |　価格を参照するため　|
-| latitude | number | 緯度 |　マップ反映に必要のため　|
-| longitude | number | 経度 |　マップ反映に必要のため　|
+| amount | text | 単位 | 値段の元となる単位 |
+| price | int4 | 価格 |　価格を参照するため　|
+| latitude | float8 | 緯度 |　マップ反映に必要のため　|
+| longitude | float8 | 経度 |　マップ反映に必要のため　|
 | notes | text | 備考 |　上記以外の情報を登録者に記載してもらうため　|
-| updated_at | timestamp | 最終更新日 |　古いデータを精査するため　|
-| report_count | number | 通報回数 |　10回以上通報があれば非表示にするため　|
+| updated_at | timestamptz | 最終更新日 |　古いデータを精査するため　|
+| report_count | int2 | 通報回数 |　10回以上通報があれば非表示にするため　|
 
 ---
 
@@ -219,7 +220,7 @@ MapShareのトップページ。各マップへのナビゲーションと、お
 
 | フィールド名 | 型 | 説明 |
 |------------|-----|------|
-| id | text | レコードID（自動生成） |
+| id | number | レコードID（自動生成） |
 | location_name | text | 場所名 |
 | sake_type | text | 日本酒の種類（） |
 | price | number | 価格 |
@@ -280,15 +281,15 @@ MapShareのトップページ。各マップへのナビゲーションと、お
 
 | フィールド名 | 型 | 説明 |
 |------------|-----|------|
-| id | text | レコードID（自動生成） |
+| id | int8 | レコードID（自動生成） |
 | location_name | text | 場所名 |
 | beer_type | text | 日本酒の種類（） |
-| price | number | 価格 |
-| latitude | number | 緯度 |
-| longitude | number | 経度 |
+| price | int4 | 価格 |
+| latitude | float8 | 緯度 |
+| longitude | float8 | 経度 |
 | notes | text | 備考 |
-| updated_at | timestamp | 最終更新日 |
-| report_count | number | 通報回数 |
+| updated_at | timestamptz | 最終更新日 |
+| report_count | int2 | 通報回数 |
 
 ## DB構成
 
