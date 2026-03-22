@@ -1,7 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY, TABLE } from "./constants.js";
-
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { supabase } from '../shared/supabase.js';
+import { TABLE } from './constants.js';
 
 export async function fetchApprovedSpots() {
   const { data, error } = await supabase

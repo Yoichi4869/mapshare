@@ -1,7 +1,4 @@
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-export const TABLE = "spots"; // 今の実装に合わせて spots のまま
+export const TABLE = "spots";
 
 export const MAP_DEFAULT = {
   center: [36, 138],
