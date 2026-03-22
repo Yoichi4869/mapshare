@@ -1,0 +1,9 @@
+{
+  "name": "日本酒マップ",
+  "short_name": "日本酒マップ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1900fa",
+  "icons": []
+}
