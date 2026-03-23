@@ -5,20 +5,8 @@ import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-import marker2x from "leaflet/dist/images/marker-icon-2x.png";
-import marker1x from "leaflet/dist/images/marker-icon.png";
-import shadow from "leaflet/dist/images/marker-shadow.png";
-
-import { MAP_DEFAULT, MAP_OPTIONS, TILE } from "./constants.js";
-import { escapeHtml, openDetailModal } from "./utils.js";
-
-// Leafletアイコン
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: marker2x,
-  iconUrl: marker1x,
-  shadowUrl: shadow
-});
+import { MAP_DEFAULT, TILE } from "./constants.js";
+import { openDetailModal } from "./utils.js";
 
 let map;
 let markers;
@@ -46,19 +34,6 @@ function createColoredIcon(seishu) {
     iconAnchor: [9, 9],
     popupAnchor: [0, -10]
   });
-}
-
-function getSeishuLabel(seishu) {
-  switch (seishu) {
-    case "junmai":
-      return "純米酒";
-    case "ginjo":
-      return "吟醸酒";
-    case "honjozo":
-      return "本醸造酒";
-    default:
-      return "";
-  }
 }
 
 export function initMap() {
@@ -116,20 +91,6 @@ export function renderMarkers(spots) {
   markers.clearLayers();
 
   spots.forEach((sake) => {
-    const seishuLabel = getSeishuLabel(sake.seishu);
-
-    const html = `
-      <b>${escapeHtml(sake.name ?? "")}</b><br>
-      ${escapeHtml(sake.pref ?? "")}<br>
-      ${seishuLabel ? `${escapeHtml(seishuLabel)}<br>` : ""}
-      ${escapeHtml(sake.description ?? "")}
-      ${
-        sake.website
-          ? `<br><a href="${escapeHtml(sake.website)}" target="_blank" rel="noopener noreferrer">公式サイトを見る</a>`
-          : ""
-      }
-    `;
-
     const marker = L.marker([sake.lat, sake.lng], {
       icon: createColoredIcon(sake.seishu)
     });
@@ -146,7 +107,6 @@ let pickMode = false;
 
 export function enablePickMode(onPicked) {
   pickMode = true;
-  // 次のクリックで確定
   map.once("click", (e) => {
     pickMode = false;
     onPicked?.(e.latlng);
