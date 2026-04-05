@@ -3,82 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ビールマップ - ブルワリーを共有">
-    <meta name="theme-color" content="#F57C00">
-    <title>ビールマップ - MapShare</title>
+    <meta name="description" content="ビールの醸造所・バーを地図上で共有できるアプリケーション">
+    <meta name="theme-color" content="#E65100">
+    <title>ビールマップ</title>
 
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🍺%3C/text%3E%3C/svg%3E">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background: #f0f2f5;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        header {
-            height: 60px;
-            background: linear-gradient(135deg, #E65100, #F57C00);
-            color: white;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        header .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            width: 100%;
-        }
-        header a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.2rem;
-            padding: 0.4rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            transition: background 0.2s;
-        }
-        header a:hover { background: rgba(255,255,255,0.2); }
-        header h1 { font-size: 1.5rem; font-weight: 700; }
-        .placeholder {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-        }
-        .placeholder-icon { font-size: 4rem; margin-bottom: 1rem; }
-        .placeholder h2 { font-size: 1.3rem; color: #333; margin-bottom: 0.5rem; }
-        .placeholder p { color: #666; font-size: 0.95rem; }
-    </style>
+    <link rel="stylesheet" href="/src/beer/style.css">
 </head>
 <body>
     <header>
         <div class="container">
-            <a href="/" title="トップへ戻る"><i class="fas fa-arrow-left"></i></a>
-            <h1>🍺 ビールマップ</h1>
+            <a href="/" class="back-to-home" title="トップへ戻る">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1><i class="fas fa-beer"></i> ビールマップ</h1>
+            <div class="header-actions">
+                <button id="refreshBtn" title="最新の情報に更新">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="addLocationBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 新規登録
+                </button>
+                <button id="helpBtn" class="btn btn-help" title="使い方の説明">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="placeholder">
-        <div class="placeholder-icon">🍺</div>
-        <h2>準備中です</h2>
-        <p>ブルワリーの共有マップを準備しています</p>
+    <main>
+        <div id="map"></div>
+
+        <!-- フィルターパネル -->
+        <div id="filterPanel" class="filter-panel">
+            <button id="filterToggle" class="filter-toggle">
+                <i class="fas fa-filter"></i> フィルター
+            </button>
+
+            <button id="locateBtn" class="locate-btn" title="現在地を表示">
+                <i class="fas fa-location-arrow"></i>
+            </button>
+
+            <div id="filterContent" class="filter-content">
+                <div class="filter-group">
+                    <label for="beerTypeFilter">ビールスタイル</label>
+                    <select id="beerTypeFilter">
+                        <option value="">すべてのスタイル</option>
+                        <option value="ipa">IPA</option>
+                        <option value="stout">スタウト</option>
+                        <option value="lager">ラガー</option>
+                        <option value="wheat">ヴァイツェン</option>
+                        <option value="pale_ale">ペールエール</option>
+                        <option value="porter">ポーター</option>
+                        <option value="sour">サワー</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchQuery">キーワード検索</label>
+                    <input type="text" id="searchQuery" placeholder="場所名で検索">
+                </div>
+                <button id="applyFilter" class="btn btn-secondary">
+                    <i class="fas fa-search"></i> 検索
+                </button>
+                <button id="clearFilter" class="btn btn-outline">
+                    <i class="fas fa-times"></i> クリア
+                </button>
+            </div>
+        </div>
+
+        <!-- 登録リスト -->
+        <div id="listPanel" class="list-panel collapsed">
+            <div class="list-header">
+                <h2><i class="fas fa-list"></i> 登録一覧</h2>
+                <button id="listToggle" class="list-toggle">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+            </div>
+            <div id="listContent" class="list-content">
+                <div id="locationList"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 登録モーダル -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> ビール場所の登録</h2>
+                <button class="close-btn" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addLocationForm" novalidate>
+                <input type="hidden" id="editId">
+
+                <div class="form-group">
+                    <label for="locationName">場所名 <span class="required">*</span></label>
+                    <input type="text" id="locationName" class="form-control" maxlength="40" required placeholder="例：○○ブルワリー（40文字まで）">
+                </div>
+
+                <div class="form-group">
+                    <label for="placeType">種別 <span class="required">*</span></label>
+                    <select id="placeType" class="form-control" required>
+                        <option value="">選択してください</option>
+                        <option value="brewery">醸造所</option>
+                        <option value="bar">ビアバー</option>
+                        <option value="shop">専門店</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="beerType">ビールスタイル <span class="required">*</span></label>
+                    <select id="beerType" class="form-control" required>
+                        <option value="">選択してください</option>
+                        <option value="ipa">IPA</option>
+                        <option value="stout">スタウト</option>
+                        <option value="lager">ラガー</option>
+                        <option value="wheat">ヴァイツェン</option>
+                        <option value="pale_ale">ペールエール</option>
+                        <option value="porter">ポーター</option>
+                        <option value="sour">サワー</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">価格（円）</label>
+                    <input type="number" id="price" class="form-control" placeholder="例: 700" min="0" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="website">公式サイトURL</label>
+                    <input type="url" id="website" class="form-control" placeholder="例: https://example.jp">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="latitude">緯度 <span class="required">*</span></label>
+                        <input type="text" id="latitude" required placeholder="例：35.681236">
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">経度 <span class="required">*</span></label>
+                        <input type="text" id="longitude" required placeholder="例：139.767125">
+                    </div>
+                </div>
+                <div class="form-group form-actions-coordinate">
+                    <button type="button" class="btn btn-outline-secondary" id="selectFromMapBtn">
+                        <i class="fas fa-map-marker-alt"></i> 地図から選択
+                    </button>
+                    <button type="button" id="getCurrentLocation" class="btn btn-outline-secondary">
+                        <i class="fas fa-location-arrow"></i> 現在地を取得
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">備考</label>
+                    <textarea id="notes" rows="4" class="form-control" maxlength="100" placeholder="営業時間、その他の情報など（100文字まで）"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancelBtn">キャンセル</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 登録
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
+    <!-- 詳細モーダル -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> 詳細情報</h2>
+                <button class="close-btn" id="closeDetailBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- ヘルプモーダル -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content help-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> 使い方</h2>
+                <button class="close-btn" onclick="window.closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body help-body">
+                <p>ピンをタップすると場所の情報を確認できます。</p>
+                <p style="margin-top: 1rem;">「新規登録」ボタンから醸造所・ビアバー・専門店を登録できます。</p>
+                <p style="margin-top: 1rem;">フィルターでビールスタイルや名前で絞り込みができます。</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="window.closeHelpModal()" class="btn-primary" style="width: 100%; padding: 12px; border-radius: 8px; border: none; cursor: pointer; background: #E65100; color: white;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script type="module" src="/src/beer/main.js"></script>
 </body>
 </html>
