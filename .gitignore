@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 環境変数ファイル（秘密情報を含むため git に含めない）
+.env
+.env.*
