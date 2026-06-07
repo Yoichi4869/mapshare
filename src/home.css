@@ -5,87 +5,58 @@
 }
 
 :root {
-    --bg-dark: #0f1117;
-    --bg-card: rgba(255, 255, 255, 0.06);
-    --bg-card-hover: rgba(255, 255, 255, 0.1);
-    --border-glass: rgba(255, 255, 255, 0.1);
-    --text-white: #f0f0f0;
-    --text-muted: rgba(255, 255, 255, 0.5);
-    --accent-fire: #e8632b;
-    --accent-sake: #a855f7;
-    --accent-beer: #f59e0b;
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --text-primary: #333;
+    --text-secondary: #555;
+    --text-muted: #999;
+    --border-color: #e0e0e0;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+    --accent-fire: #8B4513;
+    --accent-sake: #1565C0;
+    --accent-beer: #E65100;
 }
 
 html, body {
     height: 100%;
     font-family: 'Noto Sans JP', sans-serif;
-    color: var(--text-white);
-    background-color: var(--bg-dark);
-    overflow-x: hidden;
-}
-
-/* --- 背景 --- */
-body::before {
-    content: '';
-    position: fixed;
-    top: -40%;
-    left: -20%;
-    width: 80vw;
-    height: 80vw;
-    background: radial-gradient(circle, rgba(232, 99, 43, 0.12) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-body::after {
-    content: '';
-    position: fixed;
-    bottom: -30%;
-    right: -20%;
-    width: 70vw;
-    height: 70vw;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
+    color: var(--text-primary);
+    background-color: var(--bg-light);
 }
 
 /* --- ヘッダー --- */
 header {
-    position: relative;
-    z-index: 10;
-    padding: 1.2rem 1.5rem;
+    background: linear-gradient(135deg, #2c3e50, #3d5166);
+    color: white;
+    padding: 0 1.5rem;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid var(--border-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background: rgba(15, 17, 23, 0.6);
+    box-shadow: var(--shadow-lg);
 }
 
 header h1 {
     font-size: 1.1rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    color: var(--text-white);
+    color: white;
 }
 
 header h1 i {
     font-size: 1rem;
-    opacity: 0.7;
+    opacity: 0.85;
 }
 
 /* --- メイン --- */
 main {
-    position: relative;
-    z-index: 1;
-    max-width: 720px;
+    max-width: 640px;
     margin: 0 auto;
-    padding: 3rem 1.5rem 2rem;
+    padding: 2.5rem 1.5rem 2rem;
     min-height: calc(100vh - 60px);
     display: flex;
     flex-direction: column;
@@ -94,14 +65,13 @@ main {
 /* --- ヒーロー --- */
 .hero {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .hero-text {
     font-size: 0.85rem;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
     color: var(--text-muted);
-    text-transform: uppercase;
 }
 
 /* --- カードグリッド --- */
@@ -119,103 +89,96 @@ main {
     align-items: center;
     gap: 1.2rem;
     text-decoration: none;
-    color: var(--text-white);
-    background: var(--bg-card);
-    border: 1px solid var(--border-glass);
-    border-radius: 16px;
-    padding: 1.5rem 1.8rem;
+    color: var(--text-primary);
+    background: var(--bg-white);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.4rem 1.6rem;
     position: relative;
     overflow: hidden;
-    transition: background 0.3s, border-color 0.3s, transform 0.2s;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-.map-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.3s;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.25s, transform 0.2s, border-left-color 0.25s;
 }
 
 .map-card:hover {
-    background: var(--bg-card-hover);
-    transform: translateX(4px);
-}
-
-.map-card:hover::before {
-    opacity: 1;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
 }
 
 .map-card:active {
-    transform: translateX(2px);
+    transform: translateY(0);
 }
 
 /* カード個別アクセント */
-.map-card.firewood::before {
-    background: var(--accent-fire);
+.map-card.firewood {
+    border-left-color: var(--accent-fire);
 }
-.map-card.firewood:hover {
-    border-color: rgba(232, 99, 43, 0.3);
+.map-card.sake {
+    border-left-color: var(--accent-sake);
 }
-
-.map-card.sake::before {
-    background: var(--accent-sake);
-}
-.map-card.sake:hover {
-    border-color: rgba(168, 85, 247, 0.3);
-}
-
-.map-card.beer::before {
-    background: var(--accent-beer);
-}
-.map-card.beer:hover {
-    border-color: rgba(245, 158, 11, 0.3);
+.map-card.beer {
+    border-left-color: var(--accent-beer);
 }
 
 /* カードアイコン */
 .map-card-icon {
     font-size: 2rem;
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
     flex-shrink: 0;
 }
 
 .map-card.firewood .map-card-icon {
-    background: rgba(232, 99, 43, 0.1);
+    background: rgba(139, 69, 19, 0.08);
 }
 .map-card.sake .map-card-icon {
-    background: rgba(168, 85, 247, 0.1);
+    background: rgba(21, 101, 192, 0.08);
 }
 .map-card.beer .map-card-icon {
-    background: rgba(245, 158, 11, 0.1);
+    background: rgba(230, 81, 0, 0.08);
 }
 
 /* カードテキスト */
 .map-card-text {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.25rem;
     min-width: 0;
 }
 
 .map-card h2 {
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.03em;
+    color: var(--text-primary);
 }
+
+.map-card.firewood h2 { color: var(--accent-fire); }
+.map-card.sake h2    { color: var(--accent-sake); }
+.map-card.beer h2    { color: var(--accent-beer); }
 
 .map-card p {
     font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* 矢印アイコン */
+.map-card::after {
+    content: '›';
+    position: absolute;
+    right: 1.4rem;
+    font-size: 1.6rem;
+    color: var(--border-color);
+    transition: color 0.25s, right 0.2s;
+    line-height: 1;
+}
+
+.map-card:hover::after {
+    right: 1.1rem;
     color: var(--text-muted);
 }
 
@@ -223,14 +186,14 @@ main {
 .badge {
     position: absolute;
     top: 50%;
-    right: 1.5rem;
+    right: 3rem;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.08);
+    background: #f0f0f0;
     color: var(--text-muted);
     font-size: 0.65rem;
-    padding: 0.25rem 0.7rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 20px;
-    border: 1px solid var(--border-glass);
+    border: 1px solid var(--border-color);
     font-weight: 400;
     letter-spacing: 0.05em;
 }
@@ -252,15 +215,15 @@ main {
     }
 
     .map-card {
-        padding: 1.2rem 1.4rem;
+        padding: 1.1rem 1.2rem;
         gap: 1rem;
     }
 
     .map-card-icon {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         font-size: 1.6rem;
-        border-radius: 12px;
+        border-radius: 10px;
     }
 
     .map-card h2 {

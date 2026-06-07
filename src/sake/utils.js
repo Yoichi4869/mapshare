@@ -1,190 +1,108 @@
-export function qs(sel, root = document) {
-  return root.querySelector(sel);
+import { UI_CONFIG } from './constants.js';
+
+export function groupLocationsByCoords(locations) {
+    const groups = {};
+    locations.forEach(loc => {
+        const key = `${loc.latitude},${loc.longitude}`;
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(loc);
+    });
+    return groups;
 }
 
-export function toast(message, ms = 2400) {
-  const el = qs("#toast");
-  if (!el) return;
-
-  el.textContent = message;
-  el.hidden = false;
-  el.classList.add("show");
-
-  clearTimeout(el._t);
-  el._t = setTimeout(() => {
-    el.classList.remove("show");
-    el.hidden = true;
-  }, ms);
+export function sakeTypeLabel(type) {
+    switch (type) {
+        case 'junmai_daiginjo': return '純米大吟醸';
+        case 'daiginjo':        return '大吟醸';
+        case 'junmai_ginjo':    return '純米吟醸';
+        case 'ginjo':           return '吟醸';
+        case 'junmai':          return '純米';
+        case 'honjozo':         return '本醸造';
+        case 'other':           return 'その他';
+        default:                return type || '未設定';
+    }
 }
 
-export function askSpotByPrompt() {
-  const name = prompt("名前（酒蔵/お店）を入力");
-  if (!name) return null;
+export function createPopupContent(locations) {
+    let html = '<div style="max-height: 300px; overflow-y: auto; min-width: 250px;">';
 
-  const pref = prompt("都道府県（例：広島県）") ?? "";
-  const lat = Number(prompt("緯度（例：35.6812）"));
-  const lng = Number(prompt("経度（例：139.7671）"));
-  const desc = prompt("説明（任意）") ?? "";
+    if (locations.length > 0) {
+        const firstLoc = locations[0];
+        html += `
+            <div style="text-align: center; margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 2px solid #1565C0;">
+                <h3 style="margin: 0 0 0.6rem 0; color: #1565C0; font-size: 1.1rem; font-weight: bold;">${escapeHtml(firstLoc.location_name) || '名称未設定'}</h3>
+            </div>
+        `;
+    }
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    alert("緯度経度が数字ではありません");
-    return null;
-  }
+    locations.forEach((loc, index) => {
+        html += `
+            <div style="${index > 0 ? 'margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;' : ''}">
+                <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>🍶 種類:</strong> ${escapeHtml(sakeTypeLabel(loc.sake_type))}</p>
+                ${loc.price ? `<p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>💰 価格:</strong> ${escapeHtml(String(loc.price))}円</p>` : ''}
+                ${loc.notes ? `<p style="margin: 0.2rem 0; font-size: 0.85rem; color: #666;"><strong>📝 備考:</strong> ${escapeHtml(loc.notes)}</p>` : ''}
+                <button
+                    onclick="window.showDetail('${escapeHtml(String(loc.id))}')"
+                    style="margin-top: 0.4rem; padding: 0.25rem 0.5rem; background-color: #1565C0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 100%;">
+                    <i class="fas fa-info-circle"></i> 詳細を見る
+                </button>
+            </div>
+        `;
+    });
 
-  return { name, pref, lat, lng, desc };
+    html += '</div>';
+    return html;
+}
+
+export function setFillHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+export function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.className = `toast ${type} active`;
+
+    setTimeout(() => {
+        toast.classList.remove('active');
+    }, UI_CONFIG.TOAST_DURATION);
+}
+
+export function showLoading() {
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.add('active');
+}
+
+export function hideLoading() {
+    const loading = document.getElementById('loading');
+    if (loading) loading.classList.remove('active');
+}
+
+export function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('active');
+}
+
+export function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove('active');
+}
+
+export function resetForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) form.reset();
+}
+
+export function toggleFilter() {
+    const content = document.querySelector('.filter-content');
+    if (content) content.classList.toggle('active');
 }
 
 export function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, (s) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[s]));
-}
-
-export function openModal(initial = {}) {
-  const overlay = qs("#modalOverlay");
-  const form = qs("#formSubmit");
-  if (!overlay || !form) return;
-
-  overlay.classList.remove("hidden");
-  overlay.setAttribute("aria-hidden", "false");
-
-  // 初期値セット
-  form.name.value = initial.name ?? "";
-  form.taste.value = initial.taste ?? "";
-  form.seishu.value = initial.seishu ?? "";
-  if (form.items) form.items.value = initial.items ?? "";
-  if (form.price) form.price.value = initial.price ?? "";
-  if (form.website) form.website.value = initial.website ?? "";
-  form.lat.value = initial.lat ?? "";
-  form.lng.value = initial.lng ?? "";
-  form.desc.value = initial.desc ?? "";
-
-  // フォーカス
-  setTimeout(() => form.name.focus(), 0);
-}
-
-export function closeModal() {
-  const overlay = qs("#modalOverlay");
-  if (!overlay) return;
-  overlay.classList.add("hidden");
-  overlay.setAttribute("aria-hidden", "true");
-}
-
-export function readModalForm() {
-  const form = qs("#formSubmit");
-  if (!form) return null;
-
-  const name = String(form.name.value || "").trim();
-  const taste = String(form.taste.value || "").trim();
-  const seishu = String(form.seishu.value || "").trim();
-
-  const lat = Number(form.lat.value);
-  const lng = Number(form.lng.value);
-
-  const items = form.items ? String(form.items.value || "").trim() : "";
-  const priceRaw = form.price ? String(form.price.value || "").trim() : "";
-  const price = priceRaw ? Number(priceRaw) : null;
-
-  const websiteRaw = form.website ? String(form.website.value || "").trim() : "";
-  const desc = String(form.desc.value || "").trim();
-
-  let website = null;
-  if (websiteRaw) {
-    try {
-      new URL(websiteRaw);
-      website = websiteRaw;
-    } catch {
-      throw new Error("URLの形式が正しくありません");
-    }
-  }
-
-  if (!name) throw new Error("場所名は必須です");
-  if (!seishu) throw new Error("清酒区分を選択してください");
-  if (!taste) throw new Error("種類を選択してください");
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-    throw new Error("緯度/経度が不正です");
-  }
-  if (priceRaw && !Number.isFinite(price)) {
-    throw new Error("価格が不正です");
-  }
-
-  return {
-    name,
-    taste,
-    seishu,
-    items: items || null,
-    price,
-    lat,
-    lng,
-    website,
-    desc: desc || null
-  };
-}
-
-function tasteLabel(taste) {
-  switch (taste) {
-    case "dry": return "辛口傾向";
-    case "sweet": return "甘口傾向";
-    case "fruity": return "フルーティー";
-    case "rich": return "濃醇";
-    case "light": return "淡麗";
-    default: return "-";
-  }
-}
-
-function seishuLabel(seishu) {
-  switch (seishu) {
-    case "junmai": return "純米酒";
-    case "ginjo": return "吟醸酒";
-    case "honjozo": return "本醸造酒";
-    default: return "-";
-  }
-}
-
-export function openDetailModal(spot) {
-  const overlay = qs("#detailOverlay");
-  if (!overlay) return;
-
-  const nameEl = qs("#detailName");
-  const tasteEl = qs("#detailTaste");
-  const seishuEl = qs("#detailSeishu");
-  const priceEl = qs("#detailPrice");
-  const latLngEl = qs("#detailLatLng");
-  const descEl = qs("#detailDesc");
-  const mapLink = qs("#detailMapLink");
-  const websiteLink = qs("#detailWebsiteLink");
-
-  if (nameEl) nameEl.textContent = spot.name ?? "-";
-  if (tasteEl) tasteEl.textContent = tasteLabel(spot.taste);
-  if (seishuEl) seishuEl.textContent = seishuLabel(spot.seishu);
-  if (priceEl) priceEl.textContent = spot.price ? `${spot.price}円` : "-";
-  if (latLngEl) latLngEl.textContent = `緯度: ${spot.lat}, 経度: ${spot.lng}`;
-  if (descEl) descEl.textContent = spot.description ?? "-";
-
-  if (mapLink) {
-    mapLink.href = `https://www.google.com/maps?q=${spot.lat},${spot.lng}`;
-  }
-
-  if (websiteLink) {
-    if (spot.website) {
-      websiteLink.href = spot.website;
-      websiteLink.classList.remove("hidden");
-    } else {
-      websiteLink.classList.add("hidden");
-    }
-  }
-
-  overlay.classList.remove("hidden");
-  overlay.setAttribute("aria-hidden", "false");
-}
-
-export function closeDetailModal() {
-  const overlay = qs("#detailOverlay");
-  if (!overlay) return;
-  overlay.classList.add("hidden");
-  overlay.setAttribute("aria-hidden", "true");
+    return String(str ?? '').replace(/[&<>"']/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
 }
