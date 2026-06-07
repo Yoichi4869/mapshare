@@ -223,6 +223,7 @@ MapShareのトップページ。各マップへのナビゲーションを提供
 |------------|-----|------|
 | id | int8 | レコードID（自動生成） |
 | location_name | text | 場所名 |
+| brand_name | text | 銘柄名 |
 | sake_type | text | 日本酒の種類（junmai_daiginjo / daiginjo / junmai_ginjo / ginjo / junmai / honjozo / other） |
 | price | int4 | 価格 |
 | latitude | float8 | 緯度 |

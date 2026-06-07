@@ -170,6 +170,7 @@ function updateListFromMap() {
                 <div class="location-card-title">${escapeHtml(loc.location_name) || '名称未設定'}</div>
             </div>
             <div class="location-card-info">
+                ${loc.brand_name ? `<p><i class="fas fa-tag"></i> ${escapeHtml(loc.brand_name)}</p>` : ''}
                 <p><i class="fas fa-wine-bottle"></i> ${escapeHtml(sakeTypeLabel(loc.sake_type))}</p>
                 ${loc.price ? `<p><i class="fas fa-yen-sign"></i> ${escapeHtml(String(loc.price))}円</p>` : ''}
             </div>
@@ -227,6 +228,11 @@ async function showDetail(id) {
                 <h3><i class="fas fa-store"></i> 酒蔵名</h3>
                 <p>${escapeHtml(location.location_name) || '未設定'}</p>
             </div>
+            ${location.brand_name ? `
+            <div class="detail-section">
+                <h3><i class="fas fa-tag"></i> 銘柄</h3>
+                <p>${escapeHtml(location.brand_name)}</p>
+            </div>` : ''}
             <div class="detail-section">
                 <h3><i class="fas fa-wine-bottle"></i> 日本酒の種類</h3>
                 <p>${escapeHtml(sakeTypeLabel(location.sake_type))}</p>
@@ -280,6 +286,7 @@ async function showDetail(id) {
 function getFormData() {
     return {
         location_name: document.getElementById('locationName').value.trim(),
+        brand_name: document.getElementById('brandName').value.trim() || null,
         sake_type: document.getElementById('sakeType').value.trim(),
         price: document.getElementById('price').value.trim() || null,
         latitude: parseFloat(document.getElementById('latitude').value),
@@ -335,6 +342,7 @@ async function openEditModal(id) {
 
         document.getElementById('editId').value = id;
         document.getElementById('locationName').value = location.location_name || '';
+        document.getElementById('brandName').value = location.brand_name || '';
         document.getElementById('sakeType').value = location.sake_type || '';
         document.getElementById('price').value = location.price || '';
         document.getElementById('latitude').value = location.latitude || '';
