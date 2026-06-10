@@ -7,7 +7,7 @@ export async function fetchLocations(filters = {}) {
     let query = supabase
         .from(TABLE)
         .select('*')
-        .lt('report_count', CONFIG.REPORT_THRESHOLD);
+        .or(`report_count.is.null,report_count.lt.${CONFIG.REPORT_THRESHOLD}`);
 
     if (filters.search) {
         query = query.ilike('location_name', `*${filters.search}*`);
