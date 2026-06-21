@@ -2,8 +2,8 @@ name: Supabase Keepalive
 
 on:
   schedule:
-    # 5日ごとに実行（UTC 0:00 = JST 9:00）
-    - cron: '0 0 */5 * *'
+    # 2日ごとに実行（UTC 0:00 = JST 9:00）
+    - cron: '0 0 */2 * *'
   workflow_dispatch: # 手動実行も可能
 
 jobs:
