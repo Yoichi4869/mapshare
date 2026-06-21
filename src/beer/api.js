@@ -46,15 +46,6 @@ export async function updateLocation(id, updates) {
     if (error) throw error;
 }
 
-export async function deleteLocation(id) {
-    const { error } = await supabase
-        .from(TABLE)
-        .delete()
-        .eq('id', id);
-
-    if (error) throw error;
-}
-
 export async function incrementReportCount(id, currentCount) {
     return await updateLocation(id, { report_count: currentCount + 1 });
 }

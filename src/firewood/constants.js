@@ -33,17 +33,6 @@ export const UI_CONFIG = {
     LOCATE_ZOOM: 15
 };
 
-// カラー定数（CSS変数と対応）
-export const COLORS = {
-    PRIMARY: '#8B4513',
-    PRIMARY_DARK: '#6B3410',
-    SECONDARY: '#D2691E',
-    SUCCESS: '#4CAF50',
-    DANGER: '#f44336',
-    WARNING: '#ff9800',
-    INFO: '#2196F3'
-};
-
 // アイコン設定
 export const ICONS = {
     MARKER: '<i class="fas fa-fire"></i>',

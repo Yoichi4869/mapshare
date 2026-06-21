@@ -179,17 +179,3 @@ export function selectSearchResult(lat, lon, displayName) {
     clearSearchResults();
     showToast('住所を選択しました', 'success');
 }
-
-/**
- * 要素にイベントリスナーを一括設定
- * @param {Object} listeners - {id: handlerFunction} の形式
- */
-export function setupEventListeners(listeners) {
-    Object.entries(listeners).forEach(([id, handler]) => {
-        const el = document.getElementById(id);
-        if (el) {
-            const event = (id.includes('Form')) ? 'submit' : 'click';
-            el.addEventListener(event, handler);
-        }
-    });
-}
