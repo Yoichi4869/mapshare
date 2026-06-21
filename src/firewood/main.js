@@ -25,7 +25,6 @@ import {
     deleteLocation,
     incrementReportCount,
     searchAddress as apiSearchAddress,
-    sendContact,
     pingKeepalive
 } from './api.js';
 import {
@@ -100,8 +99,6 @@ function setupGlobalFunctions() {
     window.reportLocation = reportLocation;
     window.openEditModal = openEditModal;
     window.openAddToLocationModal = openAddToLocationModal;
-    window.openHelpModal = openHelpModal;
-    window.closeHelpModal = closeHelpModal;
 
     // デバッグ用：グローバル関数の設定を確認
     console.log('Global functions setup:', {
@@ -132,14 +129,9 @@ function initEventListeners() {
         'filterToggle': toggleFilter,
         'applyFilter': applyFilter,
         'clearFilter': clearFilter,
-        'helpBtn': openHelpModal,
         'refreshBtn': () => loadLocations(),
         'execSearchBtn': searchAddress,
-        'locateBtn': () => handleLocateBtn(),
-        'openContactBtn': () => openModal('contactModal'),
-        'closeContactModalBtn': () => closeModal('contactModal'),
-        'cancelContactBtn': () => closeModal('contactModal'),
-        'contactForm': handleContactSubmit
+        'locateBtn': () => handleLocateBtn()
     };
 
     Object.entries(listeners).forEach(([id, handler]) => {
@@ -165,7 +157,6 @@ function initEventListeners() {
     window.addEventListener('click', (e) => {
         if (e.target.id === 'addModal') closeAddModal();
         if (e.target.id === 'detailModal') closeDetailModal();
-        if (e.target.id === 'helpModal') closeHelpModal();
     });
 
     // 地図イベント
@@ -315,20 +306,6 @@ function closeAddModal() {
  */
 function closeDetailModal() {
     closeModal('detailModal');
-}
-
-/**
- * ヘルプモーダルを開く
- */
-function openHelpModal() {
-    openModal('helpModal');
-}
-
-/**
- * ヘルプモーダルを閉じる
- */
-function closeHelpModal() {
-    closeModal('helpModal');
 }
 
 // ======================
@@ -846,38 +823,3 @@ async function reportLocation(id) {
     }
 }
 
-// ======================
-// お問い合わせ
-// ======================
-
-/**
- * お問い合わせフォーム送信
- */
-async function handleContactSubmit(e) {
-    e.preventDefault();
-
-    const contactData = {
-        name: document.getElementById('contactName').value.trim(),
-        email: document.getElementById('contactEmail').value.trim(),
-        message: document.getElementById('contactMessage').value.trim(),
-        created_at: new Date().toISOString()
-    };
-
-    if (!contactData.name || !contactData.email || !contactData.message) {
-        showToast('全ての項目を入力してください', 'error');
-        return;
-    }
-
-    showLoading();
-    try {
-        await sendContact(contactData);
-        showToast('お問い合わせを送信しました', 'success');
-        closeModal('contactModal');
-        resetForm('contactForm');
-    } catch (error) {
-        console.error('お問い合わせ送信エラー:', error);
-        showToast('送信に失敗しました', 'error');
-    } finally {
-        hideLoading();
-    }
-}

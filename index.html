@@ -30,33 +30,125 @@
         <section class="map-grid">
             <a href="/firewood/" class="map-card firewood">
                 <div class="map-card-icon">🔥</div>
-                <div class="map-card-text">
-                    <h2>薪マップ</h2>
-                    <p>薪の販売場所を共有</p>
-                </div>
+                <h2>薪マップ</h2>
+                <p>薪の販売場所を共有</p>
             </a>
 
             <a href="/sake/" class="map-card sake">
                 <div class="map-card-icon">🍶</div>
-                <div class="map-card-text">
-                    <h2>酒マップ</h2>
-                    <p>酒蔵を共有</p>
-                </div>
+                <h2>酒マップ</h2>
+                <p>酒蔵を共有</p>
             </a>
 
             <a href="/beer/" class="map-card beer">
                 <div class="map-card-icon">🍺</div>
-                <div class="map-card-text">
-                    <h2>ビールマップ</h2>
-                    <p>醸造所を共有</p>
-                </div>
+                <h2>ビールマップ</h2>
+                <p>醸造所を共有</p>
             </a>
+        </section>
+
+        <section class="home-actions">
+            <button type="button" class="home-action-btn" id="openHelpBtn">
+                <i class="fas fa-circle-question"></i><span>使い方</span>
+            </button>
+            <button type="button" class="home-action-btn" id="openContactBtn">
+                <i class="fas fa-envelope"></i><span>お問い合わせ</span>
+            </button>
         </section>
 
         <footer class="home-footer">
             <p>&copy; 2026 MapShare Project / Developed </p>
         </footer>
     </main>
+
+    <!-- 使い方モーダル -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-circle-question"></i> 使い方</h2>
+                <button type="button" class="modal-close" id="closeHelpBtn" aria-label="閉じる">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="help-lead">MapShare は、みんなで情報を持ち寄って作る共有マップです。気になるマップを開いて使ってみましょう。</p>
+                <div class="manual-item">
+                    <h4>1. 地図から探す</h4>
+                    <img src="/img/manual1.png" alt="使い方1" class="manual-img" loading="lazy">
+                    <p>ピンをタップすると、その場所の情報や詳細を確認できます。</p>
+                </div>
+                <div class="manual-item">
+                    <h4>2. 詳細画面を開く</h4>
+                    <img src="/img/manual2.png" alt="使い方2" class="manual-img" loading="lazy">
+                    <p>「詳細を見る」を押すと詳細画面が開きます。「追加登録」で同じ場所に情報を追加できます。</p>
+                </div>
+                <div class="manual-item">
+                    <h4>3. 詳細画面について</h4>
+                    <img src="/img/manual3.png" alt="使い方3" class="manual-img" loading="lazy">
+                    <p>詳細画面では価格や種類、最終更新日などを確認できます。</p>
+                </div>
+                <div class="manual-item">
+                    <h4>4. 情報を編集・修正</h4>
+                    <img src="/img/manual4.png" alt="使い方4" class="manual-img" loading="lazy">
+                    <p>「編集」ボタンから、古くなった情報や間違った情報を最新に書き換えられます。</p>
+                </div>
+                <div class="manual-item">
+                    <h4>5. 新規で登録</h4>
+                    <img src="/img/manual5.png" alt="使い方5" class="manual-img" loading="lazy">
+                    <p>新規登録や、登録してある一覧の参照ができます。</p>
+                </div>
+                <div class="manual-item">
+                    <h4>6. 新規登録画面について</h4>
+                    <img src="/img/manual6.png" alt="使い方6" class="manual-img" loading="lazy">
+                    <p>必要な情報を入力して登録ボタンを押すと、マップに登録されます。</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-primary-full" id="closeHelpBtnFooter">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- お問い合わせモーダル -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-envelope"></i> お問い合わせ</h2>
+                <button type="button" class="modal-close" id="closeContactBtn" aria-label="閉じる">&times;</button>
+            </div>
+            <form id="contactForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="contactName">お名前（ニックネーム可）</label>
+                        <input type="text" id="contactName" class="form-control" maxlength="20" required placeholder="焚き火 太郎">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">メールアドレス（返信が必要な場合）</label>
+                        <input type="email" id="contactEmail" class="form-control" maxlength="100" placeholder="example@mail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactCategory">お問い合わせ項目</label>
+                        <select id="contactCategory" class="form-control">
+                            <option value="要望">新機能・改善のご要望</option>
+                            <option value="不具合">不具合の報告</option>
+                            <option value="削除依頼">情報の削除依頼</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactMessage">内容</label>
+                        <textarea id="contactMessage" class="form-control" maxlength="400" required placeholder="お問い合わせ内容をご記入ください"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline" id="cancelContactBtn">キャンセル</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> 送信する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
 
     <script type="module" src="/src/home.js"></script>
 </body>

@@ -77,11 +77,3 @@ export async function pingKeepalive() {
 
     if (error) console.warn('Keepalive ping failed:', error.message);
 }
-
-export async function sendContact(contactData) {
-    const { error } = await supabase
-        .from('contacts')
-        .insert([contactData]);
-
-    if (error) throw error;
-}

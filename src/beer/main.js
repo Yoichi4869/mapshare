@@ -51,8 +51,6 @@ function setupGlobalFunctions() {
     window.focusOnMap = focusOnMap;
     window.showDetail = showDetail;
     window.openEditModal = openEditModal;
-    window.openHelpModal = openHelpModal;
-    window.closeHelpModal = closeHelpModal;
     window.reportLocation = reportLocation;
 }
 
@@ -68,7 +66,6 @@ function initEventListeners() {
         'filterToggle': toggleFilter,
         'applyFilter': applyFilter,
         'clearFilter': clearFilter,
-        'helpBtn': openHelpModal,
         'refreshBtn': () => loadLocations(),
         'locateBtn': () => handleLocateBtn()
     };
@@ -92,7 +89,6 @@ function initEventListeners() {
     window.addEventListener('click', (e) => {
         if (e.target.id === 'addModal') closeAddModal();
         if (e.target.id === 'detailModal') closeModal('detailModal');
-        if (e.target.id === 'helpModal') closeHelpModal();
     });
 
     setMapClickHandler(handleMapClick);
@@ -192,14 +188,6 @@ function closeAddModal() {
     const submitBtn = document.querySelector('#addModal button[type="submit"]');
     if (modalHeader) modalHeader.innerHTML = '<i class="fas fa-plus-circle"></i> ビール場所の登録';
     if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> 登録';
-}
-
-function openHelpModal() {
-    openModal('helpModal');
-}
-
-function closeHelpModal() {
-    closeModal('helpModal');
 }
 
 async function showDetail(id) {

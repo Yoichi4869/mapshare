@@ -13,7 +13,7 @@ export const CONFIG = {
 // マップ設定
 export const MAP_CONFIG = {
     TILE_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    ATTRIBUTION: '© OpenStreetMap contributors | <b>App By ゆきぬ</b>',
+    ATTRIBUTION: '© OpenStreetMap contributors',
     MAX_ZOOM: 19,
     CLUSTER_RADIUS: 40,
     CLUSTERING_ZOOM_THRESHOLD: 16

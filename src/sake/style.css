@@ -165,20 +165,6 @@ header h1 {
     border-color: var(--text-secondary);
 }
 
-.btn-help {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-    padding: 5px;
-}
-
-.btn-help:hover {
-    transform: scale(1.1);
-}
-
 /* メイン */
 main {
     margin-top: 60px;
@@ -632,41 +618,6 @@ form {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-}
-
-/* ヘルプモーダル */
-#helpModal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
-}
-
-#helpModal.active {
-    display: flex !important;
-}
-
-.help-content {
-    background: white;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    border-radius: 10px;
-    overflow-y: auto;
-    position: relative;
-}
-
-.help-body {
-    max-height: 65vh;
-    overflow-y: auto;
-    padding: 15px !important;
-    -webkit-overflow-scrolling: touch;
 }
 
 .modal-footer {

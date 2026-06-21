@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <!-- 背景ベース -->
+  <rect width="1200" height="800" fill="#f7f4ef"/>
+  <rect width="1200" height="800" fill="url(#warm)"/>
+  <defs>
+    <linearGradient id="warm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#f0e6d8" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- すべてのモチーフを淡く（控えめに） -->
+  <g opacity="0.10" fill="none" stroke="#5a4632" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+
+    <!-- === 薪（左下） === -->
+    <g transform="translate(90,560)">
+      <!-- 積まれた丸太の断面 -->
+      <ellipse cx="60" cy="60" rx="52" ry="40"/>
+      <ellipse cx="60" cy="60" rx="30" ry="22"/>
+      <ellipse cx="60" cy="60" rx="12" ry="9"/>
+      <ellipse cx="170" cy="60" rx="52" ry="40"/>
+      <ellipse cx="170" cy="60" rx="30" ry="22"/>
+      <ellipse cx="170" cy="60" rx="12" ry="9"/>
+      <ellipse cx="115" cy="140" rx="52" ry="40"/>
+      <ellipse cx="115" cy="140" rx="30" ry="22"/>
+      <ellipse cx="115" cy="140" rx="12" ry="9"/>
+    </g>
+
+    <!-- === 日本酒（中央上：徳利とお猪口） === -->
+    <g transform="translate(520,90)">
+      <!-- 徳利（とっくり） -->
+      <path d="M70 10 q-14 0 -14 16 l0 26 q-30 16 -30 60 l0 70 q0 30 44 30 q44 0 44 -30 l0 -70 q0 -44 -30 -60 l0 -26 q0 -16 -14 -16 z"/>
+      <ellipse cx="70" cy="26" rx="14" ry="5"/>
+      <!-- お猪口（おちょこ） -->
+      <path d="M150 180 l16 44 q4 12 22 12 q18 0 22 -12 l16 -44 z"/>
+      <ellipse cx="188" cy="180" rx="38" ry="9"/>
+    </g>
+
+    <!-- === ビール（右下：ジョッキ） === -->
+    <g transform="translate(900,500)">
+      <!-- 泡 -->
+      <path d="M40 60 q-4 -34 26 -34 q6 -26 36 -22 q24 -14 44 6 q30 -6 30 28 z"/>
+      <!-- ジョッキ本体 -->
+      <path d="M40 60 l10 200 q2 24 38 24 l52 0 q36 0 38 -24 l10 -200 z"/>
+      <!-- 取っ手 -->
+      <path d="M186 96 q56 4 52 70 q-4 56 -56 56"/>
+      <!-- 中身の線（泡と液体の境界） -->
+      <path d="M44 96 l140 0" opacity="0.8"/>
+    </g>
+
+  </g>
+</svg>
