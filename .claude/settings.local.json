@@ -10,7 +10,11 @@
       "Bash(npx vite:*)",
       "Bash(curl:*)",
       "Bash(wc:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "mcp__3737f3f3-f38b-4d6e-8531-78743cff2747__list_projects",
+      "Bash(git -C \"C:\\\\Tools\\\\mapshare\" ls-files)",
+      "Bash(npm run *)",
+      "Bash(node \"C:\\\\Users\\\\Hirano\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Tools-mapshare\\\\2fcb664a-c4f0-4ccf-800a-32e4292399b4\\\\scratchpad\\\\xsstest.mjs\")"
     ]
   }
 }

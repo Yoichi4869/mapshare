@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="薪の販売場所を地図上で共有できるアプリケーション">
+    <meta name="description" content="薪マップは、薪の販売場所やまき販売所を地図上でみんなで共有できる無料アプリ。近くの薪ストーブ用の薪スポットを価格や種類から探せます。">
     <meta name="theme-color" content="#8B4513">
-    <title>薪マップ - 薪の販売場所共有アプリ</title>
-    
+    <title>薪マップ - 薪の販売場所を地図で共有</title>
+
+    <link rel="canonical" href="https://mapshare.example.com/firewood/">
+
+    <!-- Open Graph / SNS -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MapShare">
+    <meta property="og:title" content="薪マップ - 薪の販売場所を地図で共有">
+    <meta property="og:description" content="薪の販売場所を地図上でみんなで共有できる無料アプリ。近くの薪スポットを価格や種類から探せます。">
+    <meta property="og:url" content="https://mapshare.example.com/firewood/">
+    <meta property="og:image" content="https://mapshare.example.com/img/ogp.png">
+    <meta property="og:locale" content="ja_JP">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="薪マップ - 薪の販売場所を地図で共有">
+    <meta name="twitter:description" content="薪の販売場所を地図上でみんなで共有できる無料アプリ。">
+    <meta name="twitter:image" content="https://mapshare.example.com/img/ogp.png">
+
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🪵%3C/text%3E%3C/svg%3E">
     
@@ -105,24 +120,6 @@
             </div>
             <form id="addLocationForm" novalidate>
                <input type="hidden" id="editId">
-               <input type="hidden" id="salesPeriod">
-                <input type="hidden" id="contactInfo">
-                <input type="hidden" id="description">
-                <!--<div class="search-outer-container">
-                   <label class="form-label">場所を検索 (住所や施設名)</label>
-                   <div class="search-flex-box">
-                       <input type="text" id="placeSearch" class="form-control" placeholder="例: 東京都千代田区">
-                       <button type="button" id="execSearchBtn" class="btn-secondary">
-                           <i class="fas fa-search"></i>
-                       </button>
-                   </div>
-                   <div id="searchResults" class="search-results-list"></div>
-                   <small class="help-text">
-                       <i class="fas fa-info-circle"></i>うまく検索できない場合は地図から探してね
-                   </small>
-               </div>
-
-                <hr class="form-divider">-->
 
                 <div class="form-group">
                     <label for="locationName">場所名 <span class="required">*</span></label>
@@ -173,10 +170,8 @@
                     <button type="button" id="getCurrentLocation" class="btn btn-outline-secondary">
                         <i class="fas fa-location-arrow"></i> 現在地を取得
                     </button>
-                </div><input type="hidden" id="salesPeriod">
-                    <input type="hidden" id="contactInfo">
-                    <input type="hidden" id="description">
-               
+                </div>
+
                 <div class="form-group">
                     <label for="notes">備考</label>
                     <textarea id="notes" rows="4" class="form-control" maxlength="100" placeholder="営業時間、その他の情報など  （100文字まで）"></textarea>

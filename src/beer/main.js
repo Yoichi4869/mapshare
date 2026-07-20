@@ -7,7 +7,10 @@ import {
     closeModal,
     resetForm,
     toggleFilter,
-    setFillHeight
+    setFillHeight,
+    escapeHtml,
+    escapeJsArg,
+    safeUrl
 } from './utils.js';
 import {
     fetchLocations,
@@ -151,14 +154,14 @@ function updateListFromMap() {
     }
 
     listContent.innerHTML = visibleLocations.map(loc => `
-        <div class="location-card" onclick="window.showDetail('${loc.id}')">
+        <div class="location-card" onclick="window.showDetail('${escapeJsArg(loc.id)}')">
             <div class="location-card-header">
-                <div class="location-card-title">${loc.location_name || '名称未設定'}</div>
+                <div class="location-card-title">${escapeHtml(loc.location_name) || '名称未設定'}</div>
             </div>
             <div class="location-card-info">
                 <p><i class="fas fa-beer"></i> ${loc.place_type === 'brewery' ? '醸造所' : loc.place_type === 'bar' ? 'ビアバー' : '専門店'}</p>
-                <p><i class="fas fa-tag"></i> ${loc.beer_type || '未設定'}</p>
-                ${loc.price ? `<p><i class="fas fa-yen-sign"></i> ${loc.price}円</p>` : ''}
+                <p><i class="fas fa-tag"></i> ${escapeHtml(loc.beer_type) || '未設定'}</p>
+                ${loc.price ? `<p><i class="fas fa-yen-sign"></i> ${escapeHtml(loc.price)}円</p>` : ''}
             </div>
         </div>
     `).join('');
@@ -205,54 +208,58 @@ async function showDetail(id) {
         const beerTypeMap = { ipa: 'IPA', stout: 'スタウト', lager: 'ラガー', wheat: 'ヴァイツェン', pale_ale: 'ペールエール', porter: 'ポーター', sour: 'サワー', other: 'その他' };
 
         const detailContent = document.getElementById('detailContent');
+        const lat = Number(location.latitude);
+        const lng = Number(location.longitude);
+        const safeId = escapeJsArg(location.id);
+        const website = safeUrl(location.website);
         detailContent.innerHTML = `
             <div class="detail-section">
                 <h3><i class="fas fa-store"></i> 場所名</h3>
-                <p>${location.location_name || '未設定'}</p>
+                <p>${escapeHtml(location.location_name) || '未設定'}</p>
             </div>
             <div class="detail-section">
                 <h3><i class="fas fa-beer"></i> 種別</h3>
-                <p>${placeTypeMap[location.place_type] || location.place_type || '未設定'}</p>
+                <p>${escapeHtml(placeTypeMap[location.place_type] || location.place_type) || '未設定'}</p>
             </div>
             <div class="detail-section">
                 <h3><i class="fas fa-tag"></i> ビールスタイル</h3>
-                <p>${beerTypeMap[location.beer_type] || location.beer_type || '未設定'}</p>
+                <p>${escapeHtml(beerTypeMap[location.beer_type] || location.beer_type) || '未設定'}</p>
             </div>
             ${location.price ? `
             <div class="detail-section">
                 <h3><i class="fas fa-yen-sign"></i> 価格</h3>
-                <p>${location.price}円</p>
+                <p>${escapeHtml(location.price)}円</p>
             </div>` : ''}
             <div class="detail-section">
                 <h3><i class="fas fa-map"></i> 位置情報</h3>
-                <p>緯度: ${location.latitude}, 経度: ${location.longitude}</p>
+                <p>緯度: ${lat}, 経度: ${lng}</p>
             </div>
             ${location.notes ? `
             <div class="detail-section">
                 <h3><i class="fas fa-sticky-note"></i> 備考</h3>
-                <p style="white-space: pre-wrap;">${location.notes}</p>
+                <p style="white-space: pre-wrap;">${escapeHtml(location.notes)}</p>
             </div>` : ''}
             <div class="detail-section detail-actions">
-                <button class="btn btn-primary" onclick="window.focusOnMap(${location.latitude}, ${location.longitude}); window.closeModal('detailModal'); document.getElementById('listPanel').classList.add('collapsed');">
+                <button class="btn btn-primary" onclick="window.focusOnMap(${lat}, ${lng}); window.closeModal('detailModal'); document.getElementById('listPanel').classList.add('collapsed');">
                     <i class="fas fa-map-marked-alt"></i> 地図
                 </button>
-                <a href="https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}" target="_blank" class="btn btn-outline" style="margin-left: 10px;">
+                <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" class="btn btn-outline" style="margin-left: 10px;">
                     <i class="fab fa-google"></i> Googleマップで開く
                 </a>
-                ${location.website ? `
-                <a href="${location.website}" target="_blank" class="btn btn-outline" style="margin-left: 10px;">
+                ${website ? `
+                <a href="${escapeHtml(website)}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="margin-left: 10px;">
                     <i class="fas fa-external-link-alt"></i> 公式サイト
                 </a>` : ''}
-                <button class="btn btn-secondary" onclick="window.openEditModal('${location.id}')">
+                <button class="btn btn-secondary" onclick="window.openEditModal('${safeId}')">
                     <i class="fas fa-edit"></i> 編集
                 </button>
             </div>
             <div class="detail-section last-update-row" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                 <div>
                     <h3><i class="fas fa-history"></i> 最終更新日</h3>
-                    <p>${lastUpdate}</p>
+                    <p>${escapeHtml(lastUpdate)}</p>
                 </div>
-                <button onclick="window.reportLocation('${location.id}')"
+                <button onclick="window.reportLocation('${safeId}')"
                         style="background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; cursor: pointer; margin-left: auto;">
                     <i class="fas fa-flag" style="font-size: 1.5rem !important; color: #E65100 !important;"></i> 通報
                 </button>

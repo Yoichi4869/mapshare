@@ -1,5 +1,34 @@
 import { UI_CONFIG } from './constants.js';
 
+/**
+ * HTML特殊文字をエスケープ（テキスト・属性値のXSS対策）
+ */
+export function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, s => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[s]));
+}
+
+/**
+ * インラインonclickのJS文字列引数向けエスケープ（HTML属性/JS文字列の両コンテキストで安全）
+ */
+export function escapeJsArg(str) {
+    return String(str ?? '').replace(/[^\w .,:/-]/g, c => {
+        const code = c.charCodeAt(0);
+        return code <= 0xff
+            ? '\\x' + code.toString(16).padStart(2, '0')
+            : '\\u' + code.toString(16).padStart(4, '0');
+    });
+}
+
+/**
+ * http(s) 以外のスキーム（javascript: 等）を弾いてリンクのXSSを防ぐ
+ */
+export function safeUrl(url) {
+    const u = String(url ?? '').trim();
+    return /^https?:\/\//i.test(u) ? u : '';
+}
+
 export function groupLocationsByCoords(locations) {
     const groups = {};
     locations.forEach(loc => {
@@ -40,7 +69,7 @@ export function createPopupContent(locations) {
         const firstLoc = locations[0];
         html += `
             <div style="text-align: center; margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 2px solid #E65100;">
-                <h3 style="margin: 0 0 0.6rem 0; color: #E65100; font-size: 1.1rem; font-weight: bold;">${firstLoc.location_name || '名称未設定'}</h3>
+                <h3 style="margin: 0 0 0.6rem 0; color: #E65100; font-size: 1.1rem; font-weight: bold;">${escapeHtml(firstLoc.location_name) || '名称未設定'}</h3>
             </div>
         `;
     }
@@ -48,12 +77,12 @@ export function createPopupContent(locations) {
     locations.forEach((loc, index) => {
         html += `
             <div style="${index > 0 ? 'margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;' : ''}">
-                <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>🍺 種別:</strong> ${placeTypeLabel(loc.place_type)}</p>
-                <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>🎨 スタイル:</strong> ${beerTypeLabel(loc.beer_type)}</p>
-                ${loc.price ? `<p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>💰 価格:</strong> ${loc.price}円</p>` : ''}
-                ${loc.notes ? `<p style="margin: 0.2rem 0; font-size: 0.85rem; color: #666;"><strong>📝 備考:</strong> ${loc.notes}</p>` : ''}
+                <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>🍺 種別:</strong> ${escapeHtml(placeTypeLabel(loc.place_type))}</p>
+                <p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>🎨 スタイル:</strong> ${escapeHtml(beerTypeLabel(loc.beer_type))}</p>
+                ${loc.price ? `<p style="margin: 0.2rem 0; font-size: 0.9rem;"><strong>💰 価格:</strong> ${escapeHtml(loc.price)}円</p>` : ''}
+                ${loc.notes ? `<p style="margin: 0.2rem 0; font-size: 0.85rem; color: #666;"><strong>📝 備考:</strong> ${escapeHtml(loc.notes)}</p>` : ''}
                 <button
-                    onclick="window.showDetail('${loc.id}')"
+                    onclick="window.showDetail('${escapeJsArg(loc.id)}')"
                     style="margin-top: 0.4rem; padding: 0.25rem 0.5rem; background-color: #E65100; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 100%;">
                     <i class="fas fa-info-circle"></i> 詳細を見る
                 </button>

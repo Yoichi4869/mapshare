@@ -46,28 +46,8 @@ export async function updateLocation(id, updates) {
     if (error) throw error;
 }
 
-export async function deleteLocation(id) {
-    const { error } = await supabase
-        .from(TABLE)
-        .delete()
-        .eq('id', id);
-
-    if (error) throw error;
-}
-
 export async function incrementReportCount(id, currentCount) {
     return await updateLocation(id, { report_count: currentCount + 1 });
-}
-
-export async function searchAddress(query) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=jp&limit=5`;
-
-    const response = await fetch(url, {
-        headers: { 'User-Agent': 'FirewoodMapApp/1.0' }
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
 }
 
 export async function pingKeepalive() {
