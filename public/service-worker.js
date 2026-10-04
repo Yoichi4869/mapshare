@@ -1,12 +1,10 @@
-const CACHE_NAME = 'mapshare-v2';
+const CACHE_NAME = 'mapshare-v3';
+// 外部CDNはSW内のfetchがCSPのconnect-srcで判定されブロックされるため、同一オリジンのみキャッシュする
 const urlsToCache = [
   '/',
   '/firewood/',
   '/sake/',
-  '/beer/',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css'
+  '/beer/'
 ];
 
 // インストール時にキャッシュを作成
@@ -43,6 +41,12 @@ self.addEventListener('activate', event => {
 
 // フェッチ時にキャッシュを使用（Network First戦略）
 self.addEventListener('fetch', event => {
+  // 外部オリジン（unpkg・OSMタイル・CDN・Supabase等）はSWで扱わず、ブラウザに直接取得させる
+  // （SW経由だとCSPのconnect-srcで判定され、Leaflet本体や地図タイルがブロックされる）
+  if (new URL(event.request.url).origin !== self.location.origin) {
+    return;
+  }
+
   // APIリクエストはキャッシュしない
   if (event.request.url.includes('/tables/') || event.request.url.includes('/rest/v1/')) {
     event.respondWith(fetch(event.request));
